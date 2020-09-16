@@ -190,7 +190,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl gdebi
 
-ENV RSTUDIO_VERSION 1.3.1056
+ENV RSTUDIO_VERSION 1.2.5001
 
 RUN wget --quiet https://download2.rstudio.org/server/bionic/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb
 RUN gdebi -n rstudio-server-${RSTUDIO_VERSION}-amd64.deb
@@ -207,18 +207,9 @@ RUN conda install --quiet --yes \
     'r-base=4.0.2' \
     'r-crayon' \
     'r-devtools' \
-    'r-forecast' \
-    'r-hexbin*' \
     'r-htmltools' \
-    'r-htmlwidgets' \
     'r-irkernel' \
-    'r-randomforest' \
-    'r-rcurl' \
-    'r-curl' \
     'r-rmarkdown' \
-    'r-rodbc' \
-    'r-shiny' \
-    'r-tidyverse' \
     && \
     conda clean --all -f -y && \
     fix-permissions "${CONDA_DIR}"
@@ -228,4 +219,4 @@ RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com'), download.file.me
 RUN pip install --no-cache-dir jupyter-rsession-proxy
 
 ENV LD_LIBRARY_PATH="/lib:/usr/lib/x86_64-linux-gnu:/opt/conda/lib/R/lib"
-
+ENV PATH=$PATH:/usr/lib/rstudio-server/bin
