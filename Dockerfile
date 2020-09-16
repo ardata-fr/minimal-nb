@@ -188,18 +188,16 @@ RUN ln -s /bin/tar /bin/gtar
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    curl
+    curl gdebi
 
+ENV RSTUDIO_VERSION 1.3.1056
 
-RUN apt-get update && \
-    curl --silent -L --fail https://download1.rstudio.org/desktop/bionic/amd64/rstudio-1.3.959-amd64.deb > /tmp/rstudio.deb && \
-    echo '4deee7e17700cf1d64a106b707f1c6d8 /tmp/rstudio.deb' | md5sum -c - && \
-    apt-get install -y /tmp/rstudio.deb && \
-    rm /tmp/rstudio.deb && \
-    apt-get clean
+RUN wget --quiet https://download2.rstudio.org/server/bionic/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb
+RUN gdebi -n rstudio-server-${RSTUDIO_VERSION}-amd64.deb
 ENV PATH=$PATH:/usr/lib/rstudio-server/bin
 
 
+RUN echo "rsession-which-r=/opt/conda/lib/R" >> /etc/rstudio/rserver.conf
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
