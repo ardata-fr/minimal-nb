@@ -174,5 +174,39 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 
 RUN apt-get update && apt-get install -y libssl-dev zlib1g-dev pandoc pandoc-citeproc libgeos-dev libgeos++-dev make libmagic-dev gdal-bin libxml2-dev libmagick++-dev libzmq3-dev libgdal-dev unixodbc-dev libcairo2-dev imagemagick libudunits2-dev libcurl4-openssl-dev libtiff-dev libpng-dev
 
+# R pre-requisites
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    fonts-dejavu \
+    r-cran-rodbc \
+    gfortran \
+    gcc && \
+    rm -rf /var/lib/apt/lists/*
+
+# Fix for devtools https://github.com/conda-forge/r-devtools-feedstock/issues/4
+RUN ln -s /bin/tar /bin/gtar
+
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
+
+# R packages
+RUN conda install --quiet --yes \
+    'r-base=4.0.2' \
+    'r-crayon' \
+    'r-devtools' \
+    'r-forecast' \
+    'r-hexbin*' \
+    'r-htmltools' \
+    'r-htmlwidgets' \
+    'r-irkernel' \
+    'r-randomforest' \
+    'r-rcurl' \
+    'r-curl' \
+    'r-rmarkdown' \
+    'r-rodbc' \
+    'r-shiny' \
+    'r-tidyverse' \
+    && \
+    conda clean --all -f -y && \
+    fix-permissions "${CONDA_DIR}"
+
