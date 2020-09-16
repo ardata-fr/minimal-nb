@@ -190,15 +190,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl gdebi
 
-ENV RSTUDIO_VERSION 1.2.5001
-
-RUN wget --quiet https://download2.rstudio.org/server/bionic/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb
-RUN gdebi -n rstudio-server-${RSTUDIO_VERSION}-amd64.deb
-ENV PATH=$PATH:/usr/lib/rstudio-server/bin
-
-
-RUN echo "rsession-which-r=/opt/conda/lib/R" >> /etc/rstudio/rserver.conf
-
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
 
@@ -214,9 +205,3 @@ RUN conda install --quiet --yes \
     conda clean --all -f -y && \
     fix-permissions "${CONDA_DIR}"
 
-RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com'), download.file.method = 'libcurl');" >> /opt/conda/lib/R/etc/Rprofile.site
-
-RUN pip install --no-cache-dir jupyter-rsession-proxy
-
-ENV LD_LIBRARY_PATH="/lib:/usr/lib/x86_64-linux-gnu:/opt/conda/lib/R/lib"
-ENV PATH=$PATH:/usr/lib/rstudio-server/bin
