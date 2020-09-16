@@ -178,13 +178,28 @@ RUN apt-get update && apt-get install -y libssl-dev zlib1g-dev pandoc pandoc-cit
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     fonts-dejavu \
-    r-cran-rodbc \
     gfortran \
     gcc && \
     rm -rf /var/lib/apt/lists/*
 
 # Fix for devtools https://github.com/conda-forge/r-devtools-feedstock/issues/4
 RUN ln -s /bin/tar /bin/gtar
+
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl
+
+
+RUN apt-get update && \
+    curl --silent -L --fail https://download1.rstudio.org/desktop/bionic/amd64/rstudio-1.3.959-amd64.deb > /tmp/rstudio.deb && \
+    echo '4deee7e17700cf1d64a106b707f1c6d8 /tmp/rstudio.deb' | md5sum -c - && \
+    apt-get install -y /tmp/rstudio.deb && \
+    rm /tmp/rstudio.deb && \
+    apt-get clean
+ENV PATH=$PATH:/usr/lib/rstudio-server/bin
+
+
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
@@ -209,4 +224,10 @@ RUN conda install --quiet --yes \
     && \
     conda clean --all -f -y && \
     fix-permissions "${CONDA_DIR}"
+
+RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com'), download.file.method = 'libcurl');" >> /opt/conda/lib/R/etc/Rprofile.site
+
+RUN pip install --no-cache-dir jupyter-rsession-proxy
+
+ENV LD_LIBRARY_PATH="/lib:/usr/lib/x86_64-linux-gnu:/opt/conda/lib/R/lib"
 
