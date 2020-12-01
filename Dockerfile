@@ -190,8 +190,12 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl gdebi
 
+RUN apt-get update \
+ && apt-get install -y locate default-jdk default-jre liblzma-dev libbz2-dev
+
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
+
 
 # R packages
 RUN conda install --quiet --yes \
@@ -199,9 +203,10 @@ RUN conda install --quiet --yes \
     'r-crayon' \
     'r-devtools' \
     'r-htmltools' \
+    'r-rjava' \
     'r-irkernel' \
     'r-rmarkdown' \
     && \
     conda clean --all -f -y && \
     fix-permissions "${CONDA_DIR}"
-
+    
